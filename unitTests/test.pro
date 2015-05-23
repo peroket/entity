@@ -3,16 +3,9 @@
 # change according to your options ===========================
 # ============================================================
 
-# one or the other
-CONFIG          *= application
-#CONFIG          *= unitTest
-
 # needed dependencies
 EXTERNALS       =   $${PWD}/externals
 CPPFORMAT_INC   =   $${EXTERNALS}/cppformat
-
-# for unit tests
-CATCH_INC       =   $${EXTERNALS}/catch
 
 # ============================================================
 # nothing to change below this line ==========================
@@ -71,7 +64,7 @@ TEMPLATE            =	app                         # executable app
 TARGET              =   entity                      # executable name
 DESTDIR             =   $$BUILDDIR                  # executable location
 #CONFIG              *=  console
-CONFIG              *=  precompile_header
+CONFIG              *=  precompile_header exceptions_off
 PRECOMPILED_HEADER  =   precompiled.h
 QMAKE_CXXFLAGS      *=  -std=c++14 #-fno-exceptions #-fopenmp
 QT                  *=  core gui widgets
@@ -80,7 +73,8 @@ LIBS                *=  -lGLU -lGL
 # include dirs ----------------------------------
 INCLUDEPATH         *=  sources/
 HEADERS             *=  sources/Log.h
-SOURCES             *=  sources/Log.cpp
+SOURCES             *=  sources/main.cpp \
+                        sources/Log.cpp
 
 # defines --------------------------------------
 CONFIG(release, release|debug) {
@@ -94,20 +88,6 @@ include(sources/converse/converse.pri)
 include(sources/display/display.pri)
 include(sources/entity/entity.pri)
 include(sources/signal/signal.pri)
-
-application {
-    TARGET          =   entity                      # executable name
-    CONFIG          *=  exceptions_off
-    SOURCES         *=  sources/main.cpp
-}
-
-unitTest {
-    INCLUDEPATH     *=  $${CATCH_INC}
-    TARGET          =   unit_test                      # executable name
-#    CONFIG          *=  exceptions_off
-
-    include(unitTests/unitTests.pri)
-}
 
 
 

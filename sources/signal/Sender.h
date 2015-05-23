@@ -7,20 +7,19 @@
 
 namespace Signal {
 
-#define DECLARE_SIGNAL(ID, ...) template <typename ChildType> \
-                                struct ::Signal::SenderTypes<ID, ChildType> : public internal::SenderBase<ChildType, ## __VA_ARGS__> {};
+#define DECLARE_SIGNAL(ID, ...) template <> struct ::Signal::SenderTypes<ID> : public internal::SenderBase<ID, ## __VA_ARGS__> {};
 
-    template <size_t ID, typename ChildType>
+    template <size_t ID>
     struct SenderTypes;
 
     template <size_t ID>
-    class Sender : public SenderTypes<ID, Sender<ID> > {
+    class Sender : public SenderTypes<ID> {
 
-        friend class SenderTypes<ID, Sender>::SenderBase;
+        friend class SenderTypes<ID>::SenderBase;
 
     public:
-        using SignalPointer         = typename SenderTypes<ID, Sender>::SignalPointer;
-        using ConstSignalPointer    = typename SenderTypes<ID, Sender>::ConstSignalPointer;
+        using SignalPointer         = typename SenderTypes<ID>::SignalPointer;
+        using ConstSignalPointer    = typename SenderTypes<ID>::ConstSignalPointer;
 
     private:
         // the must be declared here to have one and only one per signal type
@@ -34,7 +33,7 @@ namespace Signal {
         static ConstSignalPointer getLastSignal();
         static bool hasReceivers();
 
-        using SenderTypes<ID, Sender>::send;
+        using SenderTypes<ID>::send;
 
     private:
         static void send(SignalPointer signal);
@@ -43,7 +42,7 @@ namespace Signal {
 
     // specialize if your type does not support default init (values will not be used)
     template <size_t ID>
-    typename Sender<ID>::SignalPointer Sender<ID>::s_lastSignal = std::make_shared<typename SenderTypes<ID, Sender>::SignalValues>();
+    typename Sender<ID>::SignalPointer Sender<ID>::s_lastSignal = std::make_shared<typename SenderTypes<ID>::SignalValues>();
 
 #ifdef SIGNAL_THREAD_SUPPORT
     template <size_t ID>
@@ -83,7 +82,7 @@ namespace Signal {
             SignalValues() = default;
         };
 
-        template <typename ChildType, typename... Args>
+        template <size_t ID, typename... Args>
         class SenderBase : public Base<Args...> {
 
         protected:
@@ -91,8 +90,8 @@ namespace Signal {
             static void send(Args &&... args) {
 
                 // avoid allocation and such if no one listens
-                if (ChildType::hasReceivers())
-                    ChildType::send(std::make_shared<typename Base<Args...>::SignalValues>(std::forward<Args>(args)...));
+                if (Sender<ID>::hasReceivers())
+                    Sender<ID>::send(std::make_shared<typename Base<Args...>::SignalValues>(std::forward<Args>(args)...));
 
             }
 

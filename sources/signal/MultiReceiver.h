@@ -7,16 +7,15 @@
 
 namespace Signal {
 
-    template <template <size_t, typename> class... Receiver>
+    template <size_t... IDs>
     class MultiReceiver {
 
     private:
-//        typename Sender<ID>::ConstSignalPointer m_lastSignalTreated;
-//        Function                                m_function;
+        std::tuple<typename Sender<IDs>::ConstSignalPointer...> m_signals;
+//        std::deque<size_t> m_ids; // stores the signal
 
     public:
-//        MultiReceiver(Function f);
-        MultiReceiver() = default;
+        MultiReceiver();
         MultiReceiver(MultiReceiver const &) = default;
         MultiReceiver(MultiReceiver &&) = default;
         ~MultiReceiver() = default;

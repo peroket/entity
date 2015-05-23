@@ -7,15 +7,14 @@
 
 namespace Signal {
 
-    template <size_t ID, typename Function>
+    template <size_t ID>
     class Receiver {
 
     private:
         typename Sender<ID>::ConstSignalPointer m_lastSignalTreated;
-        Function                                m_function;
 
     public:
-        Receiver(Function f);
+        Receiver();
         Receiver(Receiver const &) = default;
         Receiver(Receiver &&) = default;
         ~Receiver() = default;
@@ -23,80 +22,66 @@ namespace Signal {
         bool hasNewSignal() const;
 
         // call function for all untreated signals (and discards them)
-        void receive();
+        template <typename Function>
+        void receive(Function f);
         // call function for most ancient signal only (and discards it)
-        void receiveOne();
+        template <typename Function>
+        void receiveOne(Function f);
 
     private:
         // convert the tuple into function parameter(s) thanks to the second function
-        void apply(typename Sender<ID>::ValueTypes const & values);
-
-        template <size_t... Ints>
-        void apply(typename Sender<ID>::ValueTypes const & values, std::integer_sequence<size_t, Ints...>);
+        template <typename Function, size_t... Ints>
+        void apply(Function f, typename Sender<ID>::ValueTypes const & values, std::integer_sequence<size_t, Ints...>);
 
     };
-
-    // convenience function to create a receiver without knowing the function type
-    template <size_t ID, typename Function>
-    auto make_receiver(Function f) {
-
-        return Receiver<ID, Function>(f);
-
-    }
 
     /**************************************************************/
     /**** Inline functions ****************************************/
     /**************************************************************/
 
-    template <size_t ID, typename Function>
-    Receiver<ID, Function>::Receiver(Function f)
+    template <size_t ID>
+    Receiver<ID>::Receiver()
     : m_lastSignalTreated(Sender<ID>::getLastSignal())
-    , m_function(f)
     {}
 
     //// Public ////////////////////////////////////////////////////
 
-    template <size_t ID, typename Function>
-    inline bool Receiver<ID, Function>::hasNewSignal() const {
+    template <size_t ID>
+    inline bool Receiver<ID>::hasNewSignal() const {
 
-        return m_lastSignalTreated->m_next;
+        return static_cast<bool>(m_lastSignalTreated->m_next);
 
     }
 
-    template <size_t ID, typename Function>
-    void Receiver<ID, Function>::receive() {
+    template <size_t ID>
+    template <typename Function>
+    void Receiver<ID>::receive(Function f) {
 
         while (m_lastSignalTreated->m_next) {
             m_lastSignalTreated = m_lastSignalTreated->m_next;
-            apply(m_lastSignalTreated->m_values);
+            apply(f, m_lastSignalTreated->m_values, std::make_index_sequence<std::tuple_size<typename Sender<ID>::ValueTypes>::value>());
         }
 
     }
 
-    template <size_t ID, typename Function>
-    void Receiver<ID, Function>::receiveOne() {
+    template <size_t ID>
+    template <typename Function>
+    void Receiver<ID>::receiveOne(Function f) {
 
         if (m_lastSignalTreated->m_next) {
             m_lastSignalTreated = m_lastSignalTreated->m_next;
-            apply(m_lastSignalTreated->m_values);
+            apply(f, m_lastSignalTreated->m_values, std::make_index_sequence<std::tuple_size<typename Sender<ID>::ValueTypes>::value>());
         }
 
     }
 
     //// Protected /////////////////////////////////////////////////
 
-    template <size_t ID, typename Function>
-    inline void Receiver<ID, Function>::apply(typename Sender<ID>::ValueTypes const & values) {
+    template <size_t ID>
+    template <typename Function, size_t... Ints>
+    inline void Receiver<ID>::apply(Function f, typename Sender<ID>::ValueTypes const & values, std::integer_sequence<size_t, Ints...>) {
 
-        apply(values, std::make_index_sequence<std::tuple_size<typename Sender<ID>::ValueTypes>::value>());
-
-    }
-
-    template <size_t ID, typename Function>
-    template <size_t... Ints>
-    inline void Receiver<ID, Function>::apply(typename Sender<ID>::ValueTypes const & values, std::integer_sequence<size_t, Ints...>) {
-
-        m_function(std::get<Ints>(values)...);
+        f(std::get<Ints>(values)...);
 
     }
 
