@@ -1,6 +1,6 @@
 
 FOLDER      =   sources/signal
-INCLUDEPATH *=  $${FOLDER}
+#INCLUDEPATH *=  $${FOLDER}
 
 
 HEADERS     *=  $${FOLDER}/MultiReceiver.h \

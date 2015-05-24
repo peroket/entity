@@ -1,4 +1,7 @@
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wall" // -Wextra -Wshadow -Wnon-virtual-dtor -Weffc++"
+#pragma GCC diagnostic ignored "-Weffc++"
 
 /**************************************************************/
 /**** std *****************************************************/
@@ -8,6 +11,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <thread>
 #include <tuple>
 
 /**************************************************************/
@@ -15,4 +19,7 @@
 /**************************************************************/
 
 #define FMT_HEADER_ONLY
-#include <format.h>
+#include <cppformat/format.h>
+
+
+#pragma GCC diagnostic pop

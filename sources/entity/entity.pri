@@ -1,6 +1,6 @@
 
 FOLDER      =   sources/entity
-INCLUDEPATH *=  $${FOLDER}/include
+#INCLUDEPATH *=  $${FOLDER}
 
 
 #HEADERS     *=  \

@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "display/MainWindow.h"
 #include <QApplication>
 
 #include "Log.h"
@@ -10,7 +10,7 @@
 
 DECLARE_SIGNAL(0, int)
 
-int main(int argc, char **argv) {
+int main(int, char **) {
 
     Signal::Sender<0> send0;
     Signal::Receiver<0> rec0;

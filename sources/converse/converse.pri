@@ -1,6 +1,6 @@
 
 FOLDER      =   sources/converse
-INCLUDEPATH *=  $${FOLDER}/include
+#INCLUDEPATH *=  $${FOLDER}
 
 
 #HEADERS     *=  \

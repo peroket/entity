@@ -7,7 +7,10 @@
 
 namespace Signal {
 
-#define DECLARE_SIGNAL(ID, ...) template <> struct ::Signal::SenderTypes<ID> : public internal::SenderBase<ID, ## __VA_ARGS__> {};
+#define DECLARE_SIGNAL(ID, ...) \
+    namespace Signal { \
+        template <> struct SenderTypes<ID> : public internal::SenderBase<ID, ## __VA_ARGS__> {}; \
+    } // TODO check if better with gcc
 
     template <size_t ID>
     struct SenderTypes;
@@ -66,7 +69,7 @@ namespace Signal {
                 ValueTypes    m_values;
 
                 SignalValues() = default;
-                SignalValues(Args &&... args)
+                explicit SignalValues(Args &&... args)
                 : m_values(std::forward<Args>(args)...)
                 {}
             };

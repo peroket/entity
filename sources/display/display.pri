@@ -1,9 +1,9 @@
 
 FOLDER      =   sources/display
-INCLUDEPATH *=  $${FOLDER}/include
+#INCLUDEPATH *=  $${FOLDER}
 
 
-HEADERS     *=  $${FOLDER}/include/MainWindow.h #\
+HEADERS     *=  $${FOLDER}/MainWindow.h #\
 
 SOURCES     *=  $${FOLDER}/source/MainWindow.cpp #\
 
